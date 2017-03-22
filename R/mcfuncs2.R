@@ -8,10 +8,10 @@ run_iteration <- function(n, init, expr, env_proto) {
     
     # Initialize env for this iteration
     env$.n <- n
-    eval(parse(text=init), envir=env)
+    eval(init, envir=env)
     
     # Evaluate expression in env
-    result <- eval(parse(text=expr), envir=env)
+    result <- eval(expr, envir=env)
     
     # Add additional information to resulting environment
     if(!exists(".Result", envir=env)) env$.Result <- result
@@ -35,9 +35,13 @@ run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5
     env_proto <- new.env()
     eval(parse(text=global), envir=env_proto)
     
+    # Parse expressions
+    pinit <- parse(text=init)
+    pexpr <- parse(text=expr)
+
     # Run
-    starttime <- Sys.time
-    outcomes <- lapply(1:n, run_iteration, init=init, expr=expr, env_proto=env_proto)
+    starttime <- Sys.time()
+    outcomes <- lapply(1:n, run_iteration, init=pinit, expr=pexpr, env_proto=env_proto)
     endtime <- Sys.time()
     
     # Generate results
@@ -66,8 +70,9 @@ tmp <- function() {
     expr   <- "x + y + z"
     
     # Execute Monte Carlo
-    n <- 1000
+    n <- 100000
     results <- run_monte_carlo(n, global, init, expr)
+    attributes(results)$endtime - attributes(results)$starttime
     
     # Results
     hist(results$result)

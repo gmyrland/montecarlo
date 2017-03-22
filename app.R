@@ -11,7 +11,7 @@ default_plot    <- config$defaults$plot
 default_inspect <- config$defaults$inspect
 
 ## Source R files in the R subfolder
-sapply(list.files("R", "*.R", full.names = TRUE), source)
+sapply(list.files("R", "*.R", full.names = TRUE), source, local=TRUE)
 
 ## Shiny UI
 ui <- navbarPage(

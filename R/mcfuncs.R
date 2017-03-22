@@ -1,99 +1,73 @@
-## Monte Carlo functions (Initial testing)
-
-# Return a function that generates a random variable for
-#  a chosen variable distribution
-
-dist_func <- function(dist) {
-    switch(dist,
-           "constant" = function(param1, ...)
-               param1,
-           "uniform" = function(param1, param2, ...)
-               runif(n=1, min=param1, max=param2),
-           "normal" = function(param1, param2, ...)
-               rnorm(n=1, mean=param1, sd=param2),
-           # ... etc ...
-           # default (evaluate text expression)
-           function(expr, ...) {eval(parse(text=expr))}
-    )
-}
-
+## Monte Carlo functions (Alternate approach)
 
 # Perform a single Monte Carlo iteration
 
-run_iteration <- function(iter, vars, expr, env_prototype) {
-    # Create environment for this iteration
-    env <- new.env(parent = env_prototype)
-    
-    # Populate environment with dataframe of variables
-    for (i in seq_along(vars)) {
-        dist <- vars[i, "dist"]
-        name <- vars[i, "var"]
-        p1 <- vars[i, "param1"]
-        p2 <- vars[i, "param2"]
-        p3 <- vars[i, "param3"]
-        text <- vars[i, "expr"]
-        env[[name]] <- dist_func(dist)(param1=p1, param2=p2, param3=p3, expr=text)
-    }
-    
+run_iteration <- function(n, init, expr, env_proto) {
+    # Create environment for this iteration, inheriting from global
+    env <- new.env(parent = env_proto)
+
+    # Initialize env for this iteration
+    env$.n <- n
+    eval(init, envir=env)
+
     # Evaluate expression in env
-    result <- eval(parse(text=expr), envir=env)
-    
+    result <- eval(expr, envir=env)
+
+    # Add additional information to resulting environment
+    if(!exists(".Result", envir=env)) env$.Result <- result
+
     # Return results
-    list(n=iter, result=result)
+    return(env)
 }
 
+# Refactor resulting environments as data frame
+
+env_to_df <- function(outcomes) {
+    # Generate list of unique variable names included in set
+    vars <- unique(unlist(lapply(outcomes, function(env) ls(envir = env))))
+    vars <- append(vars, ".Result")
+
+    # Initialize dataframe of appropriate length
+    result <- data.frame(
+        .n = 1:length(outcomes),
+        stringsAsFactors = FALSE
+    )
+
+    # Populate the dataframe
+    for (var in vars) {
+        result[[var]] <- sapply(outcomes, function(env) env[[var]])
+    }
+    (result)
+}
 
 # Generate a full set of trial results
 
-run_monte_carlo <- function(vars, n, expr, seed=as.integer(runif(1,0,1e5))) {
+run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5))) {
     # Input validation
-    stopifnot(is.data.frame(vars))
-    stopifnot(is.character(expr))
-    
+    stopifnot(
+        is.character(global),
+        is.character(init),
+        is.character(expr)
+    )
+
     # Initialize
     set.seed(seed)
-    env_prototype <- new.env()
-    
+    env_proto <- new.env()
+    eval(parse(text=global), envir=env_proto)
+
+    # Parse expressions
+    pinit <- parse(text=init)
+    pexpr <- parse(text=expr)
+
     # Run
     starttime <- Sys.time()
-    outcomes <- lapply(1:n, run_iteration, vars=vars, expr=expr, env_prototype=env_prototype)
+    outcomes <- lapply(1:n, run_iteration, init=pinit, expr=pexpr, env_proto=env_proto)
     endtime <- Sys.time()
-    
+
     # Generate results
-    results <- data.frame(
-        iter = sapply(outcomes, function(x) x$n),
-        result = sapply(outcomes, function(x) x$result),
-        stringsAsFactors = FALSE
-    )
-    
+    results <- env_to_df(outcomes)
+
     attr(results, "starttime") <- starttime
     attr(results, "endtime") <- endtime
     return(results)
-}
-
-## Testing
-
-tmp <- function() {
-    # define some variables
-    vars <- data.frame(
-        var=c("x", "y", "z"),
-        name=c("X", "Y", "My variable"),
-        dist=c("normal", "uniform", "expr"),
-        param1=c(3, 5, NA),
-        param2=c(2, 10, NA),
-        param3=c(NA, NA, NA),
-        expr=c(NA, NA, "runif(1,2,3)"),
-        stringsAsFactors=FALSE
-    )
-
-    n <- 10000
-    #expr <- "x + y"
-    #expr <- "z <- 4; x <- 0; x + y + z" 
-    expr <- "z^2"
-    results <- run_monte_carlo(vars, n, expr)
-    
-    # Results
-    hist(results$result)
-    #plot(results$result, type="l")
-    #plot(cumsum(results$result)/(1:length(results$result)), type="l")
 }

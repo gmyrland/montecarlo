@@ -10,35 +10,42 @@ default_n       <- config$defaults$n_trials
 default_plot    <- config$defaults$plot
 default_inspect <- config$defaults$inspect
 
-## Source the Monte Carlo functions
-source("R/mcfuncs2.R", local=TRUE)
+## Source R files in the R subfolder
+sapply(list.files("R", "*.R", full.names = TRUE), source)
 
 ## Shiny UI
-ui <- fluidPage(
-  # Application title
-  titlePanel("Monte Carlo"),
+ui <- navbarPage(
+  theme = 'https://bootswatch.com/cerulean/bootstrap.min.css',
+  id="navbar",
 
-  sidebarLayout(
-    sidebarPanel(
-      textInput("n", "Number of runs:", default_n),
-      actionButton("simulate", "Run Simulation")
-    ),
-
-    mainPanel(
-      textAreaInput("global", "Global", default_global),
-      textAreaInput("init", "Run Initialization", default_init),
-      textAreaInput("expr", "Expression", default_expr),
-      hr(),
-      textAreaInput("plot", "Plot", default_plot),
-      plotOutput("plot_output"),
-      textAreaInput("inspect", "Inspect", default_inspect),
-      textOutput("inspect_output", container=pre)
+  title="Monte Carlo",
+  #welcomeUI("welcome"),
+  tabPanel("Simulation",
+    sidebarLayout(
+      sidebarPanel(
+        textInput("n", "Number of runs:", default_n),
+        actionButton("simulate", "Run Simulation")
+      ),
+      mainPanel(
+        textAreaInput("global", "Global", default_global),
+        textAreaInput("init", "Run Initialization", default_init),
+        textAreaInput("expr", "Expression", default_expr),
+        hr(),
+        textAreaInput("plot", "Plot", default_plot),
+        plotOutput("plot_output"),
+        textAreaInput("inspect", "Inspect", default_inspect),
+        textOutput("inspect_output", container=pre)
+      )
     )
-  )
+  ),
+  tabPanel("Results"),
+  tabPanel("Reporting"),
+  tabPanel("Settings")
 )
 
 ## Shiny Server
 server <- function(input, output, session) {
+  callModule(welcome, "welcome")
   results <- eventReactive(input$simulate, {
       # Run simulation
       n <- input$n

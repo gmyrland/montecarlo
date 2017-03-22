@@ -1,17 +1,8 @@
 library(shiny)
 library(yaml)
 
-## Load configuration and defaults
-config <- yaml.load_file('config.yml')
-default_global  <- config$defaults$global
-default_init    <- config$defaults$init
-default_expr    <- config$defaults$expr
-default_n       <- config$defaults$n_trials
-default_plot    <- config$defaults$plot
-default_inspect <- config$defaults$inspect
-
 ## Source R files in the R subfolder
-sapply(list.files("R", "*.R", full.names = TRUE), source, local=TRUE)
+sapply(list.files("R", "*.R", full.names = TRUE), source)
 
 ## Shiny UI
 ui <- navbarPage(
@@ -23,17 +14,17 @@ ui <- navbarPage(
   tabPanel("Simulation",
     sidebarLayout(
       sidebarPanel(
-        textInput("n", "Number of runs:", default_n),
+        textInput("n", "Number of runs:", get_default("n_trials")),
         actionButton("simulate", "Run Simulation")
       ),
       mainPanel(
-        textAreaInput("global", "Global", default_global),
-        textAreaInput("init", "Run Initialization", default_init),
-        textAreaInput("expr", "Expression", default_expr),
+        textAreaInput("global", "Global", get_default("global")),
+        textAreaInput("init", "Run Initialization", get_default("init")),
+        textAreaInput("expr", "Expression", get_default("expr")),
         hr(),
-        textAreaInput("plot", "Plot", default_plot),
+        textAreaInput("plot", "Plot", get_default("plot")),
         plotOutput("plot_output"),
-        textAreaInput("inspect", "Inspect", default_inspect),
+        textAreaInput("inspect", "Inspect", get_default("inspect")),
         textOutput("inspect_output", container=pre)
       )
     )

@@ -10,6 +10,8 @@ default_init   <- "x <- uniform(min=5, max=10)\ny <- normal(sd=0.5, mean=0)"
 default_expr   <- "x + y"
 default_n      <- 1000
 
+default_plot   <- "hist(results()$result)"
+
 ## Shiny UI
 ui <- fluidPage(
   # Application title
@@ -25,6 +27,8 @@ ui <- fluidPage(
       textAreaInput("global", "Global", default_global),
       textAreaInput("init", "Run Initialization", default_init),
       textAreaInput("expr", "Expression", default_expr),
+      hr(),
+      textAreaInput("plot", "Plot", default_plot),
       plotOutput("result")
     )
   )
@@ -42,7 +46,7 @@ server <- function(input, output, session) {
   })
 
   output$result <- renderPlot({
-    hist(results()$result)
+    eval(parse(text=input$plot))
   })
 
   session$onSessionEnded(function() stopApp(returnValue=NULL))

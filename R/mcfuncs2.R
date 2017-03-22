@@ -55,25 +55,3 @@ run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5
     attr(results, "endtime") <- endtime
     return(results)
 }
-
-## Testing
-
-tmp <- function() {
-    ## Text inputs can be any length of valid R expressions
-    
-    # global - common to all runs
-    global <- "x = 5"
-    # definitions for variable distributions
-    init   <- "y = rnorm(n=1, mean=0, sd=0.1)
-               z = runif(n=1, min=0, max=1)"
-    # The executed expression(s), with final value used as result
-    expr   <- "x + y + z"
-    
-    # Execute Monte Carlo
-    n <- 100000
-    results <- run_monte_carlo(n, global, init, expr)
-    attributes(results)$endtime - attributes(results)$starttime
-    
-    # Results
-    hist(results$result)
-}

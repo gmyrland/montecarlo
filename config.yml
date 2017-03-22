@@ -1,0 +1,17 @@
+# Main Configuration file for Monte Carlo shiny app
+---
+defaults:
+    n_trials: 1000
+    global : |
+        uniform <- function(min, max) runif(n=1, min=min, max=max)
+        normal <- function(sd, mean) rnorm(n=1, sd=sd, mean=mean)
+    init : |
+        x <- uniform(min=5, max=10)
+        y <- normal(sd=0.5, mean=0)
+    expr: |
+        x + y
+    plot: |
+        hist(results()$.Result)
+    inspect: |
+        head(results(), n=10)
+

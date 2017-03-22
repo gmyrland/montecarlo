@@ -1,16 +1,17 @@
 library(shiny)
+library(yaml)
+
+## Load configuration and defaults
+config <- yaml.load_file('config.yml')
+default_global  <- config$defaults$global
+default_init    <- config$defaults$init
+default_expr    <- config$defaults$expr
+default_n       <- config$defaults$n_trials
+default_plot    <- config$defaults$plot
+default_inspect <- config$defaults$inspect
 
 ## Source the Monte Carlo functions
 source("R/mcfuncs2.R", local=TRUE)
-
-## Temporary defaults
-default_global <- paste0("uniform <- function(min, max) runif(n=1, min=min, max=max)",
-                        "\nnormal <- function(sd, mean) rnorm(n=1, sd=sd, mean=mean)")
-default_init   <- "x <- uniform(min=5, max=10)\ny <- normal(sd=0.5, mean=0)"
-default_expr   <- "x + y"
-default_n      <- 1000
-
-default_plot   <- "hist(results()$.Result)"
 
 ## Shiny UI
 ui <- fluidPage(
@@ -29,7 +30,9 @@ ui <- fluidPage(
       textAreaInput("expr", "Expression", default_expr),
       hr(),
       textAreaInput("plot", "Plot", default_plot),
-      plotOutput("result")
+      plotOutput("plot_output"),
+      textAreaInput("inspect", "Inspect", default_inspect),
+      textOutput("inspect_output", container=pre)
     )
   )
 )
@@ -45,9 +48,11 @@ server <- function(input, output, session) {
       run_monte_carlo(n, global, init, expr)
   })
 
-  output$result <- renderPlot({
-    eval(parse(text=input$plot))
-    print(results())
+  output$plot_output <- renderPlot({
+      eval(parse(text=input$plot))
+  })
+  output$inspect_output <- renderPrint({
+      eval(parse(text=input$inspect))
   })
 
   session$onSessionEnded(function() stopApp(returnValue=NULL))

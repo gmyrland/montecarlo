@@ -20,6 +20,26 @@ run_iteration <- function(n, init, expr, env_proto) {
     return(env)
 }
 
+# Refactor resulting environments as data frame
+
+env_to_df <- function(outcomes) {
+    # Generate list of unique variable names included in set
+    vars <- unique(unlist(lapply(outcomes, function(env) ls(envir = env))))
+    vars <- append(vars, ".Result")
+
+    # Initialize dataframe of appropriate length
+    result <- data.frame(
+        .n = 1:length(outcomes),
+        stringsAsFactors = FALSE
+    )
+
+    # Populate the dataframe
+    for (var in vars) {
+        result[[var]] <- sapply(outcomes, function(env) env[[var]])
+    }
+    (result)
+}
+
 # Generate a full set of trial results
 
 run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5))) {
@@ -45,12 +65,8 @@ run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5
     endtime <- Sys.time()
     
     # Generate results
-    results <- data.frame(
-        n = sapply(outcomes, function(env) env$.n),
-        result = sapply(outcomes, function(env) env$.Result),
-        stringsAsFactors = FALSE
-    )
-    
+    results <- env_to_df(outcomes)
+
     attr(results, "starttime") <- starttime
     attr(results, "endtime") <- endtime
     return(results)

@@ -10,7 +10,7 @@ default_init   <- "x <- uniform(min=5, max=10)\ny <- normal(sd=0.5, mean=0)"
 default_expr   <- "x + y"
 default_n      <- 1000
 
-default_plot   <- "hist(results()$result)"
+default_plot   <- "hist(results()$.Result)"
 
 ## Shiny UI
 ui <- fluidPage(
@@ -47,6 +47,7 @@ server <- function(input, output, session) {
 
   output$result <- renderPlot({
     eval(parse(text=input$plot))
+    print(results())
   })
 
   session$onSessionEnded(function() stopApp(returnValue=NULL))

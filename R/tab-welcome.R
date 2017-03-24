@@ -16,5 +16,6 @@ welcomeUI <- function(id) {
 
 # server
 welcome <- function(input, output, session) {
-    
+    # Check for inclusion
+    if (!get_setting("welcome")) return(NULL)
 }

@@ -20,5 +20,13 @@ get_default <- function(name) {
     (v)
 }
 
+get_setting <- function(name) {
+    v <- config()$settings[[name]]
+    if (is.null(v)) {
+        warning(name, " is not set")
+    }
+    (v)
+}
+
 # Prepare config
 config <- get_config()

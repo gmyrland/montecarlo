@@ -15,3 +15,5 @@ defaults:
     inspect: |
         head(results(), n=10)
 
+settings:
+    welcome: no

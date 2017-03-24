@@ -23,17 +23,12 @@ run_iteration <- function(n, init, expr, env_proto) {
 # Refactor resulting environments as data frame
 
 env_to_df <- function(outcomes) {
-    # Generate list of unique variable names included in set
+    # Get list of unique variable names included in set
     vars <- unique(unlist(lapply(outcomes, function(env) ls(envir = env))))
     vars <- append(vars, ".Result")
 
-    # Initialize dataframe of appropriate length
-    result <- data.frame(
-        .n = 1:length(outcomes),
-        stringsAsFactors = FALSE
-    )
-
-    # Populate the dataframe
+    # Generate the dataframe
+    result <- data.frame(.n = 1:length(outcomes))
     for (var in vars) {
         result[[var]] <- sapply(outcomes, function(env) env[[var]])
     }

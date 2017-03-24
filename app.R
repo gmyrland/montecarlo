@@ -8,12 +8,13 @@ sapply(list.files("R", "*.R", full.names = TRUE), source)
 ui <- navbarPage(
   theme = 'https://bootswatch.com/cerulean/bootstrap.min.css',
   id="navbar",
-
   title="Monte Carlo",
-  #welcomeUI("welcome"),
+  windowTitle = "Monte Carlo",
+  welcomeUI("welcome"),
   tabPanel("Simulation",
     sidebarLayout(
       sidebarPanel(
+        width = 2,
         textInput("n", "Number of runs:", get_default("n_trials")),
         actionButton("simulate", "Run Simulation")
       ),

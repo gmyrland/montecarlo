@@ -2,6 +2,10 @@
 
 # ui
 welcomeUI <- function(id) {
+    # Check for inclusion
+    if (!get_setting("welcome")) return("")
+
+    # Generate welcome screen
     ns <- NS(id)
     tabPanel(
         title = "Welcome",

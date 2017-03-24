@@ -19,14 +19,18 @@ ui <- navbarPage(
         actionButton("simulate", "Run Simulation")
       ),
       mainPanel(
-        textAreaInput("global", "Global", get_default("global")),
-        textAreaInput("init", "Run Initialization", get_default("init")),
-        textAreaInput("expr", "Expression", get_default("expr")),
-        hr(),
-        textAreaInput("plot", "Plot", get_default("plot")),
-        plotOutput("plot_output"),
-        textAreaInput("inspect", "Inspect", get_default("inspect")),
-        textOutput("inspect_output", container=pre)
+        width = 10,
+        column(6,
+            textAreaInput2("global", "Global", get_default("global"), rows=5),
+            textAreaInput2("init", "Run Initialization", get_default("init"), rows=5),
+            textAreaInput2("expr", "Expression", get_default("expr"), rows=5)
+        ),
+        column(6,
+            textAreaInput2("plot", "Plot", get_default("plot")),
+            plotOutput("plot_output"),
+            textAreaInput2("inspect", "Inspect", get_default("inspect")),
+            textOutput("inspect_output", container=pre)
+        )
       )
     )
   ),

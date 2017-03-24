@@ -1,5 +1,6 @@
 library(shiny)
 library(yaml)
+library(rmarkdown)
 
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)
@@ -35,14 +36,15 @@ ui <- navbarPage(
     )
   ),
   tabPanel("Results"),
-  tabPanel("Reporting"),
+  reportingUI("reporting"),
   tabPanel("Settings")
 )
 
 ## Shiny Server
 server <- function(input, output, session) {
+  simulate <- reactive({input$simulate})
   callModule(welcome, "welcome")
-  results <- eventReactive(input$simulate, {
+  results <- eventReactive(simulate(), {
       # Run simulation
       n <- input$n
       global <- input$global
@@ -50,6 +52,7 @@ server <- function(input, output, session) {
       expr <- input$expr
       run_monte_carlo(n, global, init, expr)
   })
+  callModule(reporting, "reporting", results)
 
   output$plot_output <- renderPlot({
       eval(parse(text=input$plot))

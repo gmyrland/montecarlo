@@ -20,3 +20,42 @@ textAreaInput2 <- function (inputId, label, value = "", width = NULL, height = N
         class = "form-control", placeholder = placeholder, style = style,
         rows = rows, cols = cols, value))
 }
+
+# General code entry wrapper
+codeInput <- function(id, label, value="", width='100%', rows=3) {
+    textAreaInput2(id, label, value, rows=rows)
+}
+
+
+resultPanelUI <- function(id) {
+    ns <- NS(id)
+    tagList(
+        plotOutput(ns("plot_output")),
+        codeInput(ns("plot"), "Plot", get_default("plot"), rows=3)
+    )
+}
+
+resultPanel <- function(input, output, session, results) {
+    output$plot_output <- renderPlot({
+        eval(parse(text=input$plot))
+    })
+}
+
+dataPanelUI <- function(id) {
+    ns <- NS(id)
+    tagList(
+        codeInput(ns("inspect"), "Inspect", get_default("inspect"), rows=2),
+        textOutput(ns("inspect_output"), container=pre)
+    )
+}
+
+dataPanel <- function(input, output, session, results) {
+    data_result <- reactive({
+        #makeActiveBinding(".", results())
+        `.` <- results()
+        eval(parse(text=input$inspect))
+    })
+    output$inspect_output <- renderPrint({
+        data_result()
+    })
+}

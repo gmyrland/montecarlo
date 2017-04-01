@@ -10,7 +10,7 @@ reportingUI <- function(id) {
         #withMathJax(), # If needed for embedded shiny?
         fluidRow(
             column(4,
-               textAreaInput2(ns("markdown"), "", default_report, rows=38)
+               codeInput(ns("markdown"), "", default_report, rows=38)
             ),
             column(8,
                uiOutput(ns('rmarkdown'))

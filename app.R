@@ -22,15 +22,18 @@ ui <- navbarPage(
       mainPanel(
         width = 10,
         column(6,
-            textAreaInput2("global", "Global", get_default("global"), rows=5),
-            textAreaInput2("init", "Run Initialization", get_default("init"), rows=5),
-            textAreaInput2("expr", "Expression", get_default("expr"), rows=5)
+            codeInput("global", "Global", get_default("global"), rows=7),
+            codeInput("init", "Run Initialization", get_default("init"), rows=7),
+            codeInput("expr", "Expression", get_default("expr"), rows=7)
         ),
         column(6,
-            textAreaInput2("plot", "Plot", get_default("plot")),
-            plotOutput("plot_output"),
-            textAreaInput2("inspect", "Inspect", get_default("inspect")),
-            textOutput("inspect_output", container=pre)
+          tabsetPanel("simvalues",
+            tabPanel("Inputs",
+              "Inputs"
+            ),
+            tabPanel("Results", resultPanelUI("result-panel")),
+            tabPanel("Data", dataPanelUI("data-panel"))
+          )
         )
       )
     )
@@ -57,12 +60,8 @@ server <- function(input, output, session) {
   callModule(welcome, "welcome")
   callModule(reporting, "reporting", results)
 
-  output$plot_output <- renderPlot({
-      eval(parse(text=input$plot))
-  })
-  output$inspect_output <- renderPrint({
-      eval(parse(text=input$inspect))
-  })
+  callModule(resultPanel, "result-panel", results)
+  callModule(dataPanel, "data-panel", results)
 
   session$onSessionEnded(function() stopApp(returnValue=NULL))
 }

@@ -16,7 +16,7 @@ ui <- navbarPage(
     sidebarLayout(
       sidebarPanel(
         width = 2,
-        textInput("n", "Number of runs:", get_default("n_trials")),
+        textInput("n_trials", "Number of runs:", get_default("n_trials")),
         actionButton("simulate", "Run Simulation")
       ),
       mainPanel(
@@ -42,16 +42,19 @@ ui <- navbarPage(
 
 ## Shiny Server
 server <- function(input, output, session) {
+  # Reactives
   simulate <- reactive({input$simulate})
-  callModule(welcome, "welcome")
+  n_trials <- reactive({input$n_trials})
+  global <- reactive({input$global})
+  init <- reactive({input$init})
+  expr <- reactive({input$expr})
+
   results <- eventReactive(simulate(), {
       # Run simulation
-      n <- input$n
-      global <- input$global
-      init <- input$init
-      expr <- input$expr
-      run_monte_carlo(n, global, init, expr)
+      run_monte_carlo(n_trials(), global(), init(), expr())
   })
+
+  callModule(welcome, "welcome")
   callModule(reporting, "reporting", results)
 
   output$plot_output <- renderPlot({

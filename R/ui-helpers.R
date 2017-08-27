@@ -26,6 +26,26 @@ codeInput <- function(id, label, value="", width='100%', rows=3) {
     textAreaInput2(id, label, value, rows=rows)
 }
 
+inputPanelUI <- function(id) {
+    ns <- NS(id)
+    tagList(
+        textOutput(ns("input_results"), container=pre),
+        actionButton(ns("refresh_input"), "Refresh Inputs")
+    )
+}
+
+inputPanel <- function(input, output, session, global, init) {
+    observeEvent(input$refresh_input, {
+        n <- 1000
+        seed=1111
+        global_results <- run_monte_carlo(1, global(), "", "", seed=seed)
+        init_results <- run_monte_carlo(n, global(), init(), "", seed=seed)
+        init_results <- init_results[setdiff(names(init_results), names(global_results))]
+        output$input_results <- renderPrint({
+            summary(init_results)
+        })
+    })
+}
 
 resultPanelUI <- function(id) {
     ns <- NS(id)

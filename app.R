@@ -34,10 +34,9 @@ ui <- navbarPage(
             codeInput("expr", "Expression", get_default("expr"), rows=7)
         ),
         column(6,
-          tabsetPanel("simvalues",
-            tabPanel("Inputs",
-              "Inputs"
-            ),
+          tabsetPanel(
+            id="simvalues",
+            tabPanel("Inputs", inputPanelUI("input-panel")),
             tabPanel("Results", resultPanelUI("result-panel")),
             tabPanel("Data", dataPanelUI("data-panel"))
           )
@@ -88,6 +87,7 @@ server <- function(input, output, session) {
   callModule(welcome, "welcome")
   callModule(reporting, "reporting", results)
 
+  callModule(inputPanel, "input-panel", global, init)
   callModule(resultPanel, "result-panel", results)
   callModule(dataPanel, "data-panel", results)
 

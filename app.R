@@ -1,6 +1,7 @@
 library(shiny)
 library(yaml)
 library(rmarkdown)
+library(jsonlite)
 
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)
@@ -16,6 +17,12 @@ ui <- navbarPage(
     sidebarLayout(
       sidebarPanel(
         width = 2,
+        fileInput("file1", "File:",
+                  accept = "application/json"
+        ),
+        downloadButton('save_file', 'Save'),
+        tableOutput("contents"),
+        hr(),
         textInput("n_trials", "Number of runs:", get_default("n_trials")),
         actionButton("simulate", "Run Simulation")
       ),
@@ -51,6 +58,27 @@ server <- function(input, output, session) {
   global <- reactive({input$global})
   init <- reactive({input$init})
   expr <- reactive({input$expr})
+  file <- reactive({input$file1})
+
+  # Load file
+  observeEvent(file(), {
+      if (is.null(file()))
+          return(NULL)
+      # Parse file
+      x <- fromJSON(readChar(file()$datapath, file()$size))
+      updateTextAreaInput(session, "expr", value = x$expr)
+      cat("File Loaded\n")}
+  )
+  # Save file
+  output$save_file <- downloadHandler(
+      filename = function() {("montecarlo.json")},
+      content = function(file) {
+          # All relevant fields to object
+          x <- list(`expr` = expr())
+          # Write to tmp file
+          writeLines(toJSON(x, pretty=TRUE), file)
+      }
+  )
 
   results <- eventReactive(simulate(), {
       # Run simulation

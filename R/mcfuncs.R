@@ -14,7 +14,8 @@ run_iteration <- function(n, init, expr, env_proto) {
     result <- eval(expr, envir=env)
 
     # Add additional information to resulting environment
-    if(!exists(".Result", envir=env)) env$.Result <- result
+    if(!exists(".Result", envir=env, inherits=FALSE))
+        env$.Result <- result
 
     # Return results
     return(env)
@@ -60,9 +61,11 @@ run_monte_carlo <- function(n, global, init, expr, seed=as.integer(runif(1,0,1e5
     endtime <- Sys.time()
 
     # Generate results
-    results <- env_to_df(outcomes)
+    results <- new.env(parent = emptyenv())
+    results$data <- env_to_df(outcomes)
 
-    attr(results, "starttime") <- starttime
-    attr(results, "endtime") <- endtime
+    results$starttime <- starttime
+    results$endtime <- endtime
+    results$env <- env_proto
     return(results)
 }

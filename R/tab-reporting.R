@@ -26,8 +26,9 @@ reporting <- function(input, output, session, results) {
         t <- tempfile(fileext = '.Rmd')
         cat(input$markdown, file = t)
         on.exit(unlink(sub('.html$', '*', t)), add = TRUE)
-        env = new.env()
+        env = new.env(emptyenv())
         try(env$results <- results())
+        #env = new.env(parent=result())
         t <- render(
             input = t,
             #runtime = "shiny",

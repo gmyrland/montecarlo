@@ -11,9 +11,9 @@ defaults:
     expr: |
         x + y
     plot: |
-        hist(results()$.Result)
+        hist(results()$data$.Result)
     inspect: |
-        head(results(), n=10)
+        head(results()$data, n=10)
 
 settings:
     welcome: no

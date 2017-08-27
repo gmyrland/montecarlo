@@ -40,9 +40,9 @@ inputPanel <- function(input, output, session, global, init) {
         seed=1111
         global_results <- run_monte_carlo(1, global(), "", "", seed=seed)
         init_results <- run_monte_carlo(n, global(), init(), "", seed=seed)
-        init_results <- init_results[setdiff(names(init_results), names(global_results))]
+        init_results$data <- init_results$data[setdiff(names(init_results$data), names(global_results$data))]
         output$input_results <- renderPrint({
-            summary(init_results)
+            summary(init_results$data)
         })
     })
 }

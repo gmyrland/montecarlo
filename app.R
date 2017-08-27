@@ -11,7 +11,7 @@ ui <- navbarPage(
   id="navbar",
   title="Monte Carlo",
   windowTitle = "Monte Carlo",
-  welcomeUI("welcome"),
+  #welcomeUI("welcome"),
   tabPanel("Simulation",
     sidebarLayout(
       sidebarPanel(

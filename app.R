@@ -19,7 +19,7 @@ ui <- navbarPage(
       sidebarPanel(
         width = 2,
         fileInput("file1", "File:",
-                  accept = "application/json"
+                  accept = "application/json", placeholder = "Unititled"
         ),
         downloadButton('save_file', 'Save'),
         tableOutput("contents"),
@@ -60,25 +60,9 @@ server <- function(input, output, session) {
   expr <- reactive({input$expr})
   file <- reactive({input$file1})
 
-  # Load file
-  observeEvent(file(), {
-      if (is.null(file()))
-          return(NULL)
-      # Parse file
-      x <- fromJSON(readChar(file()$datapath, file()$size))
-      updateTextAreaInput(session, "expr", value = x$expr)
-      cat("File Loaded\n")}
-  )
-  # Save file
-  output$save_file <- downloadHandler(
-      filename = function() {("montecarlo.json")},
-      content = function(file) {
-          # All relevant fields to object
-          x <- list(`expr` = expr())
-          # Write to tmp file
-          writeLines(toJSON(x, pretty=TRUE), file)
-      }
-  )
+  # Load/Save file
+  observeEvent(file(), load_file(file, session))
+  output$save_file <- save_file(input, output, session)
 
   results <- eventReactive(simulate(), {
       # Run simulation

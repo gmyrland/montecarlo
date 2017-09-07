@@ -2,6 +2,7 @@ library(shiny)
 library(yaml)
 library(rmarkdown)
 library(jsonlite)
+library(DT)
 
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)
@@ -44,7 +45,7 @@ ui <- navbarPage(
       )
     )
   ),
-  tabPanel("Results"),
+  resultsTabUI("results"),
   reportingUI("reporting"),
   tabPanel("Settings")
 )
@@ -85,6 +86,7 @@ server <- function(input, output, session) {
   })
 
   callModule(welcome, "welcome")
+  callModule(resultstab, "results", results)
   callModule(reporting, "reporting", results)
 
   callModule(inputPanel, "input-panel", global, init)

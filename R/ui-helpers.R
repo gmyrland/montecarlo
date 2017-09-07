@@ -29,21 +29,41 @@ codeInput <- function(id, label, value="", width='100%', rows=3) {
 inputPanelUI <- function(id) {
     ns <- NS(id)
     tagList(
-        textOutput(ns("input_results"), container=pre),
+        uiOutput(ns("input_results"), container=pre),
         actionButton(ns("refresh_input"), "Refresh Inputs")
     )
 }
 
-inputPanel <- function(input, output, session, global, init) {
-    observeEvent(input$refresh_input, {
-        n <- 1000
-        seed=1111
-        global_results <- run_monte_carlo(1, global(), "", "", seed=seed)
-        init_results <- run_monte_carlo(n, global(), init(), "", seed=seed)
-        init_results$data <- init_results$data[setdiff(names(init_results$data), names(global_results$data))]
-        output$input_results <- renderPrint({
-            summary(init_results$data)
+inputPanel <- function(input, output, session, envir, global, init, results) {
+    init_results <- eventReactive(input$refresh_input, {
+        n <- 5000; seed=1111
+        init_results <- run_monte_carlo(n, envir(), global(), init(), "", seed=seed)
+        init_results$data <- init_results$data[init_results$init_vars]
+        (init_results)
+    })
+    plotname <- function(i) paste("plot", i, sep="")
+    output$input_results <- renderUI({
+        tags_list <- lapply(1:ncol(init_results()$data), function(i) {
+            plotOutput(session$ns(plotname(i)), height = 200)
         })
+        do.call(tagList, tags_list)
+    })
+    max_plot <- 25
+    output$plot <- renderPlot(plot(wt ~ cyl, mtcars))
+    plot_function <- function(col) {
+        lbl <- names(init_results()$data)[col]
+        data <- init_results()$data[, col]
+        try(hist(data, main=lbl, breaks=25))
+    }
+    observe({
+        for (i in 1:max_plot) {
+            local({
+                i <- i
+                output[[plotname(i)]] <- renderPlot({
+                    plot_function(i)
+                })
+            })
+        }
     })
 }
 

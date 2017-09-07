@@ -30,15 +30,23 @@ ui <- navbarPage(
       mainPanel(
         width = 10,
         column(6,
-            codeInput("global", "Global", get_default("global"), rows=7),
-            codeInput("init", "Run Initialization", get_default("init"), rows=7),
-            codeInput("expr", "Expression", get_default("expr"), rows=7)
+          tabsetPanel(
+            id="code",
+            selected = "Code",
+            tabPanel("Environment",
+                codeInput("environment", "Environment", get_default("environment"), rows=26)),
+            tabPanel("Code",
+                codeInput("global", "Global", get_default("global"), rows=7),
+                codeInput("init", "Run Initialization", get_default("init"), rows=7),
+                codeInput("expr", "Expression", get_default("expr"), rows=7)
+            )
+          )
         ),
         column(6,
           tabsetPanel(
             id="simvalues",
             tabPanel("Inputs", inputPanelUI("input-panel")),
-            tabPanel("Results", resultPanelUI("result-panel")),
+            tabPanel("Results", value="Results", resultPanelUI("result-panel")),
             tabPanel("Data", dataPanelUI("data-panel"))
           )
         )
@@ -55,6 +63,7 @@ server <- function(input, output, session) {
   # Reactives
   simulate <- reactive({input$simulate})
   n_trials <- reactive({input$n_trials})
+  envir <- reactive({input$environment})
   global <- reactive({input$global})
   init <- reactive({input$init})
   expr <- reactive({input$expr})
@@ -66,14 +75,14 @@ server <- function(input, output, session) {
 
   results <- eventReactive(simulate(), {
       # Run simulation
-      run_monte_carlo(n_trials(), global(), init(), expr())
+      run_monte_carlo(n_trials(), envir(), global(), init(), expr())
   })
 
   callModule(welcome, "welcome")
   callModule(resultstab, "results", results)
   callModule(reporting, "reporting", results)
 
-  callModule(inputPanel, "input-panel", global, init)
+  callModule(inputPanel, "input-panel", envir, global, init, results)
   callModule(resultPanel, "result-panel", results)
   callModule(dataPanel, "data-panel", results)
 

@@ -12,7 +12,7 @@ defaults:
         y <- normal(sd=0.5, mean=0)
     expr: |
         x + y
-    plot: |
+    result_code: |
         hist(results()$data$.Result)
     inspect: |
         head(results()$data, n=10)

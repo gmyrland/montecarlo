@@ -3,6 +3,7 @@ library(yaml)
 library(rmarkdown)
 library(jsonlite)
 library(DT)
+library(ggplot2)
 
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)
@@ -82,7 +83,7 @@ server <- function(input, output, session) {
   callModule(resultstab, "results", results)
   callModule(reporting, "reporting", results)
 
-  callModule(inputPanel, "input-panel", envir, global, init, results)
+  callModule(inputPanel, "input-panel", envir, global, init)
   callModule(resultPanel, "result-panel", results)
   callModule(dataPanel, "data-panel", results)
 

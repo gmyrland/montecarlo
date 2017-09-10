@@ -22,26 +22,6 @@ reportingUI <- function(id) {
 # server
 reporting <- function(input, output, session, results) {
     ns <- session$ns
-    document <- reactive({
-        t <- tempfile(fileext = '.Rmd')
-        cat(input$markdown, file = t)
-        on.exit(unlink(sub('.html$', '*', t)), add = TRUE)
-        env = new.env(emptyenv())
-        try(env$results <- results())
-        #env = new.env(parent=result())
-        t <- render(
-            input = t,
-            #runtime = "shiny",
-            output_format = html_document(theme = "cerulean"), # quick fix
-            envir = env
-        )
-        
-        ## read results
-        res <- readLines(t)
-        
-        #wrappers <- c(readLines, HTML, withMathJax)
-        #for (.F in wrappers) res <- .F(res)
-        withMathJax(HTML(res))
-    })
+    document <- reactive(render_rmarkdown(input$markdown, results))
     output$rmarkdown = renderUI({document()})
 }

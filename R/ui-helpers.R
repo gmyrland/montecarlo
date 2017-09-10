@@ -26,3 +26,25 @@ codeInput <- function(id, label, value="", width='100%', rows=3) {
     textAreaInput2(id, label, value, rows=rows)
 }
 
+render_rmarkdown <- function(markdown, results) {
+    t <- tempfile(fileext = '.Rmd')
+    cat(markdown, file = t)
+    on.exit(unlink(sub('.html$', '*', t)), add = TRUE)
+    env = new.env(emptyenv())
+    try(env$results <- results())
+    #env = new.env(parent=result())
+    t <- render(
+        input = t,
+        #runtime = "shiny",
+        output_format = html_document(theme = "cerulean"), # quick fix
+        envir = env
+    )
+
+    ## read results
+    res <- readLines(t)
+
+    #wrappers <- c(readLines, HTML, withMathJax)
+    #for (.F in wrappers) res <- .F(res)
+    #withMathJax(HTML(res))
+    HTML(res)
+}

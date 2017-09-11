@@ -8,6 +8,9 @@ library(ggplot2)
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)
 
+## rmarkdown options
+opts_chunk$set(echo=FALSE)
+
 ## Shiny UI
 ui <- navbarPage(
   theme = 'https://bootswatch.com/cerulean/bootstrap.min.css',

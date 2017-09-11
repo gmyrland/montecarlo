@@ -30,9 +30,10 @@ render_rmarkdown <- function(markdown, results) {
     t <- tempfile(fileext = '.Rmd')
     cat(markdown, file = t)
     on.exit(unlink(sub('.html$', '*', t)), add = TRUE)
-    env = new.env(emptyenv())
-    try(env$results <- results())
-    #env = new.env(parent=result())
+
+    env_base <- results()
+    env <- new.env(parent = env_base)
+
     t <- render(
         input = t,
         #runtime = "shiny",
@@ -42,9 +43,5 @@ render_rmarkdown <- function(markdown, results) {
 
     ## read results
     res <- readLines(t)
-
-    #wrappers <- c(readLines, HTML, withMathJax)
-    #for (.F in wrappers) res <- .F(res)
-    #withMathJax(HTML(res))
     HTML(res)
 }

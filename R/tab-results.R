@@ -14,6 +14,8 @@ resultsTabUI <- function(id) {
 resultstab <- function(input, output, session, results) {
     ns <- session$ns
     output$results <- DT::renderDataTable(
-        datatable(results()$data)
+        datatable(
+            results()$data, options=list(), rownames = FALSE
+        ), server=TRUE
     )
 }

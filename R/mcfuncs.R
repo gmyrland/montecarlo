@@ -39,11 +39,6 @@ env_to_df <- function(outcomes) {
         if (levels == 0 | identical(env, emptyenv())) return(NULL)
         return(c(ls(envir=env, ...), get_env_ls(parent.env(env), levels - 1, ...)))
     }
-
-    # vars <- unique(unlist(lapply(outcomes, function(env)
-    #     c(ls(envir=parent.env(parent.env(env))), ls(envir=parent.env(env)), ls(envir=env)))))
-    # vars <- append(vars, ".Result")
-
     vars <- c(unique(unlist(lapply(outcomes, get_env_ls, levels=3))), ".Result")
 
     # Generate the dataframe
@@ -66,7 +61,7 @@ run_monte_carlo <- function(n, envir, global, init, expr, seed=as.integer(runif(
 
     # Initialize
     set.seed(seed)
-    env_envir <- new.env() #parent=baseenv())
+    env_envir <- new.env()
     eval(parse(text=envir), envir=env_envir)
     env_proto <- new.env(parent=env_envir)
     eval(parse(text=global), envir=env_proto)

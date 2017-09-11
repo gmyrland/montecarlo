@@ -24,12 +24,7 @@ inputPanel <- function(input, output, session, envir, global, init) {
     output$plot <- renderPlot(plot(wt ~ cyl, mtcars))
     plot_function <- function(col) {
         lbl <- names(init_results()$data)[col]
-        #data <- init_results()$data[, col]
-        #try(hist(data, main=lbl, breaks=25))
-        #data <- init_results()$data[, col, drop=FALSE]
-        #try(ggplot(data) + geom_histogram(aes_string(x=names(data)[1]), bins=100)) # geom_density(aes_string(x=col)))
-        try(ggplot(init_results()$data, aes_string(x=names(init_results()$data)[col])) + geom_density(fill="darkgreen", alpha=0.5)) #geom_freqpoly()) #geom_density())
-        #"gaussian", "rectangular", "triangular", "epanechnikov", "biweight", "cosine" or "optcosine"
+        try(ggplot(init_results()$data, aes_string(x=names(init_results()$data)[col])) + geom_density(fill="darkgreen", alpha=0.5))
     }
     observe({
         for (i in 1:max_plot) {
@@ -68,8 +63,10 @@ dataPanelUI <- function(id) {
 dataPanel <- function(input, output, session, results) {
     data_result <- reactive({
         #makeActiveBinding(".", results())
-        `.` <- results()
-        eval(parse(text=input$inspect))
+        #`.` <- results()
+        env_base <- results()
+        env <- new.env(parent = env_base)
+        eval(parse(text=input$inspect), envir=env)
     })
     output$inspect_output <- renderPrint({
         data_result()

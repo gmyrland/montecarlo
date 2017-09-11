@@ -12,9 +12,12 @@ defaults:
     expr: |
         x + y
     result_code: |
-        hist(results()$data$.Result)
+        ```{r}
+        hist(data$.Result)
+        ```
     inspect: |
-        head(results()$data, n=10)
-
+        head(data, n=10)
+    default_file:
+        www/default.json
 settings:
     welcome: no

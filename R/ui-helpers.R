@@ -43,5 +43,5 @@ render_rmarkdown <- function(markdown, results) {
 
     ## read results
     res <- readLines(t)
-    HTML(res)
+    withMathJax(HTML(res))
 }

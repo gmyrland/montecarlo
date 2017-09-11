@@ -4,6 +4,7 @@ library(rmarkdown)
 library(jsonlite)
 library(DT)
 library(ggplot2)
+library(knitr)
 
 ## Source R files in the R subfolder
 sapply(list.files("R", "*.R", full.names = TRUE), source)

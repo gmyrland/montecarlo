@@ -2,12 +2,19 @@ inputPanelUI <- function(id) {
     ns <- NS(id)
     tagList(
         uiOutput(ns("input_results"), container=pre),
+        checkboxInput(ns("update"), "Automatically update", value = TRUE),
         actionButton(ns("refresh_input"), "Refresh Inputs")
     )
 }
 
 inputPanel <- function(input, output, session, envir, global, init) {
-    init_results <- eventReactive(input$refresh_input, {
+    init_updated <- reactiveVal(0)
+    observe({
+        init()
+        if (isolate(!input$update)) return()
+        isolate(init_updated(init_updated() + 1))
+    })
+    init_results <- eventReactive({input$refresh_input; init_updated()}, {
         n <- 5000; seed=1111
         init_results <- run_monte_carlo(n, envir(), global(), init(), "", seed=seed)
         init_results$data <- init_results$data[init_results$init_vars]

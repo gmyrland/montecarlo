@@ -38,11 +38,14 @@ ui <- navbarPage(
             id="code",
             selected = "Code",
             tabPanel("Environment",
-                codeInput("environment", "Environment", get_default("environment"), rows=26)),
+                codeInput("envir", "Environment", get_default("environment"), rows=26)),
             tabPanel("Code",
                 codeInput("global", "Global", get_default("global"), rows=7),
                 codeInput("init", "Run Initialization", get_default("init"), rows=7),
                 codeInput("expr", "Expression", get_default("expr"), rows=7)
+            ),
+            tabPanel("Finalize",
+                codeInput("finalize", "Finalize", get_default("finalize"), rows=26)
             )
           )
         ),
@@ -67,11 +70,12 @@ server <- function(input, output, session) {
   # Reactives
   simulate <- reactive({input$simulate})
   n_trials <- reactive({input$n_trials})
-  envir <- reactive({input$environment})
+  envir <- reactive({input$envir})
   global <- reactive({input$global})
   init <- reactive({input$init})
   expr <- reactive({input$expr})
   file <- reactive({input$file1})
+  finalize <- reactive({input$finalize})
 
   # Load/Save file
   observeEvent(file(), load_file(file, session))
@@ -79,7 +83,7 @@ server <- function(input, output, session) {
 
   results <- eventReactive(simulate(), {
       # Run simulation
-      run_monte_carlo(n_trials(), envir(), global(), init(), expr())
+      run_monte_carlo(n_trials(), envir(), global(), init(), expr(), finalize())
   })
 
   callModule(welcome, "welcome")

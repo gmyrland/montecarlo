@@ -11,6 +11,8 @@ defaults:
         y <- normal(sd=0.5, mean=0)
     expr: |
         x + y
+    finalize: |
+
     result_code: |
         ```{r}
         hist(data$.Result)

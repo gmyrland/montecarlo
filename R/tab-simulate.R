@@ -16,7 +16,7 @@ inputPanel <- function(input, output, session, envir, global, init) {
     })
     init_results <- eventReactive({input$refresh_input; init_updated()}, {
         n <- 5000; seed=1111
-        init_results <- run_monte_carlo(n, envir(), global(), init(), "", seed=seed)
+        init_results <- run_monte_carlo(n, envir(), global(), init(), "", "", seed=seed)
         init_results$data <- init_results$data[init_results$init_vars]
         (init_results)
     })

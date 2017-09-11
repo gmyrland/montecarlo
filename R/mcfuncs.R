@@ -51,12 +51,14 @@ env_to_df <- function(outcomes) {
 
 # Generate a full set of trial results
 
-run_monte_carlo <- function(n, envir, global, init, expr, seed=as.integer(runif(1,0,1e5))) {
+run_monte_carlo <- function(n, envir, global, init, expr, finalize, seed=as.integer(runif(1,0,1e5))) {
     # Input validation
     stopifnot(
+        is.character(envir),
         is.character(global),
         is.character(init),
-        is.character(expr)
+        is.character(expr),
+        is.character(finalize)
     )
 
     # Initialize
@@ -71,16 +73,15 @@ run_monte_carlo <- function(n, envir, global, init, expr, seed=as.integer(runif(
     pexpr <- parse(text=expr)
 
     # Run
-    starttime <- Sys.time()
-    outcomes <- lapply(1:n, run_iteration, init=pinit, expr=pexpr, env_proto=env_proto)
-    endtime <- Sys.time()
+    results <- new.env()
 
     # Generate results
-    results <- new.env(parent = emptyenv())
+    results$starttime <- Sys.time()
+    outcomes <- lapply(1:n, run_iteration, init=pinit, expr=pexpr, env_proto=env_proto)
     results$data <- env_to_df(outcomes)
+    eval(parse(text=finalize), envir=results)
+    results$endtime <- Sys.time()
 
-    results$starttime <- starttime
-    results$endtime <- endtime
     results$env <- env_proto
     results$global_vars <- ls(envir=env_proto)
     results$init_vars <- unique(unlist(lapply(outcomes, function(env) ls(envir = parent.env(env)))))

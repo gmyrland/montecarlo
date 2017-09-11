@@ -36,8 +36,8 @@ render_rmarkdown <- function(markdown, results) {
 
     t <- render(
         input = t,
-        #runtime = "shiny",
-        output_format = html_document(theme = "cerulean"), # quick fix
+        runtime = "shiny",
+        output_format = html_fragment(),
         envir = env
     )
 

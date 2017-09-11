@@ -1,5 +1,14 @@
 ## Monte Carlo functions
 
+# Helper functions
+
+uniform <- function(min, max) {
+    runif(n=1, min=min, max=max)
+}
+normal <- function(sd, mean) {
+    rnorm(n=1, sd=sd, mean=mean)
+}
+
 # Perform a single Monte Carlo iteration
 
 run_iteration <- function(n, init, expr, env_proto) {

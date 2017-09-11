@@ -3,8 +3,7 @@
 defaults:
     n_trials: 1000
     environment : |
-        uniform <- function(min, max) runif(n=1, min=min, max=max)
-        normal <- function(sd, mean) rnorm(n=1, sd=sd, mean=mean)
+
     global : |
 
     init : |

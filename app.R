@@ -74,12 +74,14 @@ server <- function(input, output, session) {
   global <- reactive({input$global})
   init <- reactive({input$init})
   expr <- reactive({input$expr})
-  file <- reactive({input$file1})
   finalize <- reactive({input$finalize})
+  file <- reactive({input$file1$datapath})
 
   # Load/Save file
   observeEvent(file(), load_file(file, session))
   output$save_file <- save_file(input, output, session)
+  if (file.exists(get_default("default_file")))
+      load_file(get_default("default_file"), session)
 
   results <- eventReactive(simulate(), {
       # Run simulation

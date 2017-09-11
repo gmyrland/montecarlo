@@ -4,15 +4,17 @@ load_file <- function(file, session) {
     if (is.null(file()))
         return(NULL)
     # Read file
-    fpath <- file()$datapath
-    fsize <- file()$size
-    x <- fromJSON(readChar(fpath, fsize))
+    x <- fromJSON(readChar(file, file.info(file)$size))
     # Parse file
     updateTextAreaInput(session, "n_trials", value = x$n_trials)
     updateTextAreaInput(session, "envir", value = x$envir)
     updateTextAreaInput(session, "global", value = x$global)
     updateTextAreaInput(session, "init", value = x$init)
     updateTextAreaInput(session, "expr", value = x$expr)
+    updateTextAreaInput(session, "finalize", value = x$finalize)
+    updateTextAreaInput(session, NS("result-panel", "markdown"), value = x$result_code)
+    updateTextAreaInput(session, NS("data-panel", "inspect"), value = x$inspect)
+    updateTextAreaInput(session, NS("reporting", "markdown"), value = x$reporting)
 }
 
 save_file <- function(input, output, session) {
@@ -24,7 +26,11 @@ save_file <- function(input, output, session) {
             `envir` = input$envir,
             `global` = input$global,
             `init` = input$init,
-            `expr` = input$expr
+            `expr` = input$expr,
+            `finalize` = input$finalize,
+            `result_code` = input[[NS("result-panel", "markdown")]],
+            `inspect` = input[[NS("data-panel", "inspect")]],
+            `reporting` = input[[NS("reporting", "markdown")]]
         )
         # Write to tmp file
         writeLines(toJSON(x, pretty=TRUE), file)

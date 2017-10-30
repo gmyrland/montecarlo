@@ -6,7 +6,8 @@ resultsTabUI <- function(id) {
     tabPanel(
         title = 'Results',
         h1("Results"),
-        DT::dataTableOutput(ns("results"))
+        DT::dataTableOutput(ns("results")),
+        downloadButton(ns('csv'), 'csv')
     )
 }
 
@@ -17,5 +18,12 @@ resultstab <- function(input, output, session, results) {
         datatable(
             results()$data, options=list(), rownames = FALSE
         ), server=TRUE
+    )
+    output$csv <- downloadHandler(
+        filename=function() {"montecarlo.csv"},
+        content=function(file) {
+            write.csv(results()$data, file, row.names=FALSE)
+        },
+        contentType='text/csv'
     )
 }

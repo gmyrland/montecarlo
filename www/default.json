@@ -1,0 +1,11 @@
+{
+  "n_trials": ["10000"],
+  "envir": ["# Libraries\nlibrary(dplyr)\n\n# Common helper functions and code not specific to particular problem"],
+  "global": ["# Initial code, run once and inherited by all iterations\nthreshold <- 110\na <- 9.81"],
+  "init": ["# Probability distributions (run once per iteration)\nm <- normal(mean=10, sd=0.5)\n"],
+  "expr": ["# The relevant calculations.\n# The final value is stored to .Result unless it is otherwise defined\nf <- m * a"],
+  "finalize": ["# Summary data and stats for use in result reporting and visualization\n# The result data frame is stored in 'data'\n\nmean_result <- mean(data$.Result)\nsd_result <- sd(data$.Result)"],
+  "result_code": ["```{r}\nggplot(data, aes(x=.Result)) + geom_histogram(fill=\"darkgreen\", color=\"black\", bins=30)\n```"],
+  "inspect": ["head(data, n=10)\n"],
+  "reporting": ["# A Simple Monte Carlo Simulation\n\nWe ran a simple simulation to determine the force exerted by an object.\nThe gravitational acceleration, a was known ($a = `r data$a[1]`$), but only an estimate of the mass was known.\n\nThe probability distribution function of $m$ is shown below.\n\n```{r, fig.height=2}\ndata_frame(\n  x = seq(7.5, 12.5, length=1000),\n  m = dnorm(x, mean=10, sd=0.5)\n) %>%\nggplot(aes(x=x, ymin=0, ymax=m)) + geom_ribbon(fill=\"darkgreen\", alpha=0.5, color=\"black\")\n```\n\nThe simulation was run `r nrow(data)` times, pulling values for $m$ from the probability distribution, using the equation:\n\n$$ f = m * a $$\n\n### Result\n\nThe experiment gave the following result for the expected value for $f$.\n```{r}\nmean_result\n```\nAssuming a force of $f=110$ is too great, based on the available information, the  force exceeds the allowed threshold `r mean(data$.Result>data$threshold)`% of the time.\n```{r, fig.height=2}\nggplot(data, aes(x=.Result)) + geom_histogram(aes(fill=.Result>threshold), color=\"black\", bins=30)\n```"]
+}

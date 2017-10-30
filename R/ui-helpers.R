@@ -26,7 +26,7 @@ codeInput <- function(id, label, value="", width='100%', rows=3) {
     textAreaInput2(id, label, value, rows=rows)
 }
 
-render_rmarkdown <- function(markdown, results) {
+render_html_fragment <- function(markdown, results) {
     t <- tempfile(fileext = '.Rmd')
     cat(markdown, file = t)
     on.exit(unlink(sub('.html$', '*', t)), add = TRUE)
@@ -44,4 +44,22 @@ render_rmarkdown <- function(markdown, results) {
     ## read results
     res <- readLines(t)
     withMathJax(HTML(res))
+}
+
+render_document <- function(markdown, results, output_format, file) {
+    t <- tempfile(fileext = '.Rmd')
+    cat(markdown, file = t)
+    ext <- regmatches(file, regexpr("\\.[^\\.]*", file))
+    on.exit(unlink(sub(paste0(ext, '$'), '*', t)), add = TRUE)
+
+    env_base <- results()
+    env <- new.env(parent = env_base)
+    t <- render(
+        input = t,
+        #runtime = "shiny",
+        output_format = output_format,
+        output_dir = 'www/tmp',
+        envir = env
+    )
+    file.copy(t, file)
 }

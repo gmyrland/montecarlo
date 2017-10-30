@@ -55,14 +55,14 @@ resultPanelUI <- function(id) {
 
 resultPanel <- function(input, output, session, results) {
     ns <- session$ns
-    document <- reactive(render_rmarkdown(input$markdown, results))
+    document <- reactive(render_html_fragment(input$markdown, results))
     output$result_output = renderUI({document()})
 }
 
 dataPanelUI <- function(id) {
     ns <- NS(id)
     tagList(
-        codeInput(ns("inspect"), "Inspect", get_default("inspect"), rows=2),
+        codeInput(ns("inspect"), "Inspect", get_default("inspect"), rows=3),
         textOutput(ns("inspect_output"), container=pre)
     )
 }

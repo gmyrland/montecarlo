@@ -97,6 +97,7 @@ server <- function(input, output, session) {
   callModule(resultPanel, "result-panel", results)
   callModule(dataPanel, "data-panel", results)
 
+  lapply(c(NS("result-panel", "result_output"), NS("reporting", "rmarkdown")), function(x) outputOptions(output, x, suspendWhenHidden = FALSE))
   session$onSessionEnded(function() stopApp(returnValue=NULL))
 }
 

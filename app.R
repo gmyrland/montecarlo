@@ -63,7 +63,10 @@ ui <- navbarPage(
   ),
   resultsTabUI("results"),
   reportingUI("reporting"),
-  tabPanel("Settings")
+  tabPanel("Settings"),
+  tabPanel("Guide", {
+    uiOutput("guide")
+  })
 )
 
 ## Shiny Server
@@ -85,8 +88,8 @@ server <- function(input, output, session) {
       load_file(get_default("default_file"), session)
 
   results <- eventReactive(simulate(), {
-      # Run simulation
-      run_monte_carlo(n_trials(), envir(), global(), init(), expr(), finalize())
+    # Run simulation
+    run_monte_carlo(n_trials(), envir(), global(), init(), expr(), finalize())
   })
 
   callModule(welcome, "welcome")
@@ -97,7 +100,12 @@ server <- function(input, output, session) {
   callModule(resultPanel, "result-panel", results)
   callModule(dataPanel, "data-panel", results)
 
-  lapply(c(NS("result-panel", "result_output"), NS("reporting", "rmarkdown")), function(x) outputOptions(output, x, suspendWhenHidden = FALSE))
+  output$guide <- renderUI(render_html_fragment(readChar("README.md", file.info("README.md")$size), new.env))
+
+  lapply(
+    c(NS("result-panel", "result_output"), NS("reporting", "rmarkdown"), "guide"),
+    function(x) outputOptions(output, x, suspendWhenHidden = FALSE)
+  )
   session$onSessionEnded(function() stopApp(returnValue=NULL))
 }
 

@@ -1,13 +1,23 @@
 ## Monte Carlo functions
 
 # Helper functions
+mchelpers_init <- "
+uniform <- function(min, max) {
+    x <- get('.n', envir=parent.frame()) / 5000
+    qunif(x, min=min, max=max)
+}
+normal <- function(sd, mean) {
+    x <- get('.n', envir=parent.frame()) / 5000
+    qnorm(x, sd=sd, mean=mean)
+}"
 
+mchelpers <- "
 uniform <- function(min, max) {
     runif(n=1, min=min, max=max)
 }
 normal <- function(sd, mean) {
     rnorm(n=1, sd=sd, mean=mean)
-}
+}"
 
 # Perform a single Monte Carlo iteration
 
@@ -64,6 +74,7 @@ run_monte_carlo <- function(n, envir, global, init, expr, finalize, seed=as.inte
     # Initialize
     set.seed(seed)
     env_envir <- new.env()
+    eval(parse(text=ifelse(expr=="", mchelpers_init, mchelpers)), envir=env_envir)
     eval(parse(text=envir), envir=env_envir)
     env_proto <- new.env(parent=env_envir)
     eval(parse(text=global), envir=env_proto)

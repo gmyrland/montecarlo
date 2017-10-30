@@ -1,6 +1,6 @@
 # montecarlo
 
-montecarlo is an R package that provides a web app for [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_method) simulations using the shiny package.
+montecarlo is an R web app for [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_method) simulations using the shiny package.
 The goal of the project is to provide a framework for users to develop re-useable simulation workflows, while simultaneously exposing enough underlying R directly to the user for them to incorporate any use case.
 Simulation results can be reported as pdf, docx, html, or csv, as well as graphically within the app.
 
@@ -83,11 +83,7 @@ The Guide tab contains basic guidance for the app.
 
 # Installation
 
-The development version of the package can be installed from GitHub as follows.
-
-```
-devtools::install_github("gmyrland/montecarlo")
-```
+The development version of the app can be downloaded or cloned from GitHub ([gmyrland/montecarlo](https://github.com/gmyrland/montecarlo)).
 
 ## Prerequisites
 

@@ -85,7 +85,7 @@ server <- function(input, output, session) {
   observeEvent(file(), load_file(file(), session))
   output$save_file <- save_file(input, output, session)
   if (file.exists(get_default("default_file")))
-      load_file(get_default("default_file"), session)
+    load_file(get_default("default_file"), session)
 
   results <- eventReactive(simulate(), {
     # Run simulation

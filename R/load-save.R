@@ -1,7 +1,7 @@
 # Until a more elegant solution is coded...
 
 load_file <- function(file, session) {
-    if (is.null(file()))
+    if (is.null(file))
         return(NULL)
     # Read file
     x <- fromJSON(readChar(file, file.info(file)$size))

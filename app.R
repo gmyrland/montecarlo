@@ -79,7 +79,7 @@ server <- function(input, output, session) {
   file <- reactive({input$file1$datapath})
 
   # Load/Save file
-  observeEvent(file(), load_file(file, session))
+  observeEvent(file(), load_file(file(), session))
   output$save_file <- save_file(input, output, session)
   if (file.exists(get_default("default_file")))
       load_file(get_default("default_file"), session)
